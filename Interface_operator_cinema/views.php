@@ -2,14 +2,11 @@
 
 use Cinema\App;
 
-/**
- * Unified views renderer for both admin and user.
- * Called from index.php with $viewType and $isAdminMode set.
- */
-
-$pdo = App::getConnection();
+if (!isset($pdo) || !$pdo) {
+    $pdo = App::getConnection();
+}
 if (!$pdo) {
-    echo '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Не удалось подключиться к базе данных</div>';
+    echo '<div class="alert alert-danger">Нет подключения к базе данных</div>';
     return;
 }
 

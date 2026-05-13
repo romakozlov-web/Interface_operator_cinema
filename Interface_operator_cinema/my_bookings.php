@@ -1,18 +1,26 @@
 <?php
 use Cinema\App;
-if (!isset($pdo) || !$pdo) { echo '<div class="alert alert-danger">Ошибка БД</div>'; return; }
-$customerEmail = $_GET['email'] ?? '';
+
+if (!isset($pdo) || !$pdo) {
+    $pdo = App::getConnection();
+}
+if (!$pdo) {
+    echo '<div class="alert alert-danger">Ошибка БД</div>';
+    return;
+}
+
+// Всегда определяем переменную
+$customerEmail = trim($_GET['email'] ?? '');
 $bookings = [];
+
 if (!empty($customerEmail)) {
-    $stmt = $pdo->prepare("
-        SELECT b.*, f.title as film_title, h.name as hall_name, s.date as session_date
+    $stmt = $pdo->prepare("SELECT b.*, f.title as film_title, h.name as hall_name, s.date as session_date
         FROM bookings b
         JOIN sessions s ON b.session_id = s.id
         JOIN films f ON s.film_id = f.id
         JOIN halls h ON s.hall_id = h.id
         WHERE b.customer_email = ?
-        ORDER BY b.booking_date DESC
-    ");
+        ORDER BY b.booking_date DESC");
     $stmt->execute([$customerEmail]);
     $bookings = $stmt->fetchAll();
 }
@@ -28,6 +36,7 @@ if (!empty($customerEmail)) {
             </div>
             <button type="submit" class="btn"><i class="fas fa-search"></i> Показать</button>
         </form>
+
         <?php if (!empty($customerEmail)): ?>
             <?php if (empty($bookings)): ?>
                 <div class="alert alert-warning">Бронирований не найдено</div>
@@ -45,4 +54,10 @@ if (!empty($customerEmail)) {
         <?php endif; ?>
     </div>
 </div>
-<style>.booking-card { border:1px solid var(--border-color); border-radius:8px; padding:15px; margin-bottom:15px; }</style>
+<style>
+.booking-card 
+{ border:1px solid var(--border-color); 
+border-radius:8px; 
+padding:15px; 
+margin-bottom:15px; }
+</style>

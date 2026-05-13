@@ -2,12 +2,9 @@
 
 use Cinema\App;
 
-/**
- * Unified add-record handler: film, hall, session.
- * Accessed via ?action=add_film|add_hall|add_session
- */
-
-$pdo = App::getConnection();
+if (!isset($pdo) || !$pdo) {
+    $pdo = App::getConnection();
+}
 if (!$pdo) {
     echo '<div class="alert alert-danger">Ошибка подключения к БД</div>';
     return;
